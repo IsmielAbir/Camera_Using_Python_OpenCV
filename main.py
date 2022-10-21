@@ -15,14 +15,25 @@ class Window(QWidget):
         
         self.window_width = 640
         self.window_height = 400
+        
+        self.img_width = 640
+        self.img_height = 400
+        
+        
         self.setWindowTitle("Philosophy Camera App")
+        self.setGeometry(200,200, self.window_width, self.window_height)
+
         self.setFixedSize(self.window_width, self.window_height)
+        
+        self.ui()
         
         
         
     def ui(self):
         #container all ui
-        pass
+        self.image_lable = QLabel(self)
+        self.image_lable.setGeometry(0,0,self.img_width, self.img_height)
+        self.show()
     
     def update(self):
         #all update
@@ -36,3 +47,9 @@ class Window(QWidget):
         #record images
         pass
         
+        
+#run
+
+app = QApplication(sys.argv)
+win = Window()
+sys.exit(app.exec_())
