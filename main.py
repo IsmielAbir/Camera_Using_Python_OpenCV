@@ -4,9 +4,11 @@ Camera Application using python
 Author: Md. Ismiel Hossen Abir
 
 '''
+from multiprocessing.resource_sharer import stop
 import sys
 from tkinter import Grid
 from turtle import shape
+from webbrowser import get
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import QTimer
@@ -29,6 +31,12 @@ class Window(QWidget):
         
         self.camera_icon = QIcon(cam_icon_path)
         self.rec_icon = QIcon(rec_icon_path)
+        self.stop_icon = QIcon(stop_icon_path)
+        
+        
+        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        
+        
         
         self.setWindowTitle("Philosophy Camera App")
         self.setGeometry(200,200, self.window_width, self.window_height)
@@ -68,7 +76,7 @@ class Window(QWidget):
         
         
         self.rec_btn = QPushButton(self)
-        self.rec_btn.setIcon(self.rec_icon)
+        #self.rec_btn.setIcon(self.rec_icon)
         
         self.rec_btn.setStyleSheet("border-radius:30; border: 2px solid black; border-width: 3px")
         self.rec_btn.setFixedSize(60,60)
@@ -94,6 +102,14 @@ class Window(QWidget):
         
         _, self.frame = self.cap.read()
         
+        
+        if self.record_flag == True:
+            print('Recording...')
+            self.rec_btn.setIcon(self.stop_icon)
+            self.frame = cv2.circle(self.frame, (20,70),5,(0,0,255),10)
+        else:
+            self.rec_btn.setIcon(self.rec_icon)
+        
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
         height, width, channel = frame.shape
         step = channel * width 
@@ -117,6 +133,8 @@ class Window(QWidget):
         else:
             self.record_flag = True
             print("Starting the record")
+            self.get_time()
+            self.out = cv2.VideoWriter(f"{self.dt}.avi", self.fourcc, 20.0, (self.img_width, self.img_height))
             
     
     
@@ -133,6 +151,7 @@ class Window(QWidget):
 
 cam_icon_path = 'assets/camera.png'
 rec_icon_path = 'assets/video-camera.png'
+stop_icon_path = 'assets/stop-button.png'
 
 app = QApplication(sys.argv)
 win = Window()
