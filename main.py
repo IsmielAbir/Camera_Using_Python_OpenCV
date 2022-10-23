@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import QTimer
 import cv2
+import datetime
 
 class Window(QWidget):
     def __init__(self):
@@ -22,8 +23,12 @@ class Window(QWidget):
         self.img_width = 640
         self.img_height = 400
         
+        self.dt = '0-0-0-'
+        self.record_flag = False
+        
         
         self.camera_icon = QIcon(cam_icon_path)
+        self.rec_icon = QIcon(rec_icon_path)
         
         self.setWindowTitle("Philosophy Camera App")
         self.setGeometry(200,200, self.window_width, self.window_height)
@@ -49,7 +54,7 @@ class Window(QWidget):
         self.image_lable = QLabel(self)
         self.image_lable.setGeometry(0,0,self.img_width, self.img_height)
         
-        
+        #camera but5ton 
         self.capture_btn = QPushButton(self)
         self.capture_btn.setIcon(self.camera_icon)
         
@@ -57,13 +62,28 @@ class Window(QWidget):
         self.capture_btn.setFixedSize(60,60)
         self.capture_btn.clicked.connect(self.save_img)
         
+        
+        
+        #record button
+        
+        
+        self.rec_btn = QPushButton(self)
+        self.rec_btn.setIcon(self.rec_icon)
+        
+        self.rec_btn.setStyleSheet("border-radius:30; border: 2px solid black; border-width: 3px")
+        self.rec_btn.setFixedSize(60,60)
+        self.rec_btn.clicked.connect(self.record)
+        
+        
         if not self.timer.isActive():
             self.cap = cv2.VideoCapture(0)
             self.timer.start(20)
             
             
         grid.addWidget(self.capture_btn, 0,0)
-        grid.addWidget(self.image_lable,0,1)
+        grid.addWidget(self.image_lable,0,1,2,3)
+        grid.addWidget(self.rec_btn, 1,0)
+
         
         
         self.show()
@@ -83,17 +103,36 @@ class Window(QWidget):
     
     def save_img(self):
         #save images
-        cv2.imwrite('my_cap_img.jpg', self.frame)
+        print('save images')
+        self.get_time()
+        cv2.imwrite(f"{self.dt}.jpg", self.frame)
     
     def record(self):
         #record images
-        pass
+        print(self.record_flag)
+        
+        if self.record_flag == True:
+            self.record_flag=False
+            print("Stopping the record")
+        else:
+            self.record_flag = True
+            print("Starting the record")
+            
+    
+    
+    
+    
+    def get_time(self):
+        now = datetime.datetime.now()
+        self.dt = now.strftime("%m-%d-%y, %H-%M-%S")
+        print(self.dt)
         
         
 #run
 
 
 cam_icon_path = 'assets/camera.png'
+rec_icon_path = 'assets/video-camera.png'
 
 app = QApplication(sys.argv)
 win = Window()
